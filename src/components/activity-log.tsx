@@ -1,11 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { MoreHorizontal, FileText, Play, CheckCircle2, Clock } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { InlineSessionForm } from "@/components/inline-session-form";
 
 const DATA = [
     {
@@ -17,6 +17,8 @@ const DATA = [
         status: "Done",
         focusScore: "Focused",
         focusValue: 100,
+        startTime: "09:00",
+        endTime: "09:39"
     },
     {
         id: 2,
@@ -27,6 +29,8 @@ const DATA = [
         status: "In Progress",
         focusScore: "Neutral",
         focusValue: 50,
+        startTime: "10:00",
+        endTime: "10:45"
     },
     {
         id: 3,
@@ -37,6 +41,8 @@ const DATA = [
         status: "Done",
         focusScore: "Distracted",
         focusValue: 25,
+        startTime: "11:00",
+        endTime: "13:10"
     },
 ];
 
@@ -53,68 +59,87 @@ const FOCUS_STYLES: Record<string, string> = {
 };
 
 export function ActivityLog() {
+    const [editingId, setEditingId] = useState<number | null>(null);
+
+    const handleEdit = (id: number) => {
+        setEditingId(id);
+    };
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+    };
+
+    const handleSaveEdit = () => {
+        // In a real app, you would update the data here
+        setEditingId(null);
+    };
+
     return (
-        <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
-            <Table>
-                <TableHeader className="bg-gray-50/50">
-                    <TableRow className="hover:bg-transparent">
-                        <TableHead className="w-[40px]">
-                            <Checkbox className="translate-y-[2px]" />
-                        </TableHead>
-                        <TableHead className="font-medium text-xs uppercase tracking-wider text-gray-500">Task / Notes</TableHead>
-                        <TableHead className="font-medium text-xs uppercase tracking-wider text-gray-500 w-[120px]">Category</TableHead>
-                        <TableHead className="font-medium text-xs uppercase tracking-wider text-gray-500 w-[100px]">Focus</TableHead>
-                        <TableHead className="font-medium text-xs uppercase tracking-wider text-gray-500 w-[100px]">Duration</TableHead>
-                        <TableHead className="w-[50px]"></TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {DATA.map((item) => (
-                        <TableRow key={item.id} className="group hover:bg-gray-50/50 transition-colors">
-                            <TableCell>
-                                <Checkbox className="translate-y-[2px]" />
-                            </TableCell>
-                            <TableCell>
-                                <div className="flex flex-col gap-0.5">
-                                    <span className="font-semibold text-gray-900">{item.title}</span>
-                                    <span className="text-xs text-gray-500 line-clamp-1">{item.notes}</span>
+        <div className="space-y-2">
+            <div className="flex items-center justify-between px-4 py-2 text-xs font-medium uppercase tracking-wider text-gray-400">
+                <div className="flex-1">Task / Notes</div>
+                <div className="w-[120px]">Category</div>
+                <div className="w-[100px]">Focus</div>
+                <div className="w-[100px] text-right">Duration</div>
+            </div>
+
+            <div className="space-y-2">
+                {DATA.map((item) => (
+                    <div key={item.id}>
+                        {editingId === item.id ? (
+                            <InlineSessionForm
+                                initialData={item}
+                                onCancel={handleCancelEdit}
+                                onSave={handleSaveEdit}
+                            />
+                        ) : (
+                            <div
+                                onClick={() => handleEdit(item.id)}
+                                className="group flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:border-gray-300 transition-all cursor-pointer"
+                            >
+                                <div className="flex-1 min-w-0 pr-4">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="font-semibold text-gray-900 truncate">{item.title}</span>
+                                        <span className="text-sm text-gray-500 line-clamp-1">{item.notes}</span>
+                                    </div>
                                 </div>
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant="outline" className={cn("font-medium border-0", CATEGORY_STYLES[item.category] || "bg-gray-100 text-gray-700")}>
-                                    <div className={cn("w-1.5 h-1.5 rounded-full mr-1.5 currentColor", item.category === "CCS Cases" ? "bg-red-500" : item.category === "Research" ? "bg-blue-500" : "bg-purple-500")}></div>
-                                    {item.category}
-                                </Badge>
-                            </TableCell>
-                            <TableCell>
-                                <div className={cn("inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium", FOCUS_STYLES[item.focusScore])}>
-                                    {item.focusScore}
+
+                                <div className="w-[120px] shrink-0">
+                                    <Badge variant="outline" className={cn("font-medium border-0", CATEGORY_STYLES[item.category] || "bg-gray-100 text-gray-700")}>
+                                        <div className={cn("w-1.5 h-1.5 rounded-full mr-1.5 currentColor", item.category === "CCS Cases" ? "bg-red-500" : item.category === "Research" ? "bg-blue-500" : "bg-purple-500")}></div>
+                                        {item.category}
+                                    </Badge>
                                 </div>
-                            </TableCell>
-                            <TableCell>
-                                <div className="flex items-center gap-1.5 text-sm text-gray-600 font-mono">
-                                    {item.status === "In Progress" ? (
-                                        <div className="flex items-center gap-1.5 text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
-                                            <span className="relative flex h-2 w-2">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                                            </span>
-                                            {item.duration}
-                                        </div>
-                                    ) : (
-                                        <span>{item.duration}</span>
-                                    )}
+
+                                <div className="w-[100px] shrink-0">
+                                    <div className={cn("inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium", FOCUS_STYLES[item.focusScore])}>
+                                        {item.focusScore === "Focused" && "🔥"}
+                                        {item.focusScore === "Neutral" && "😐"}
+                                        {item.focusScore === "Distracted" && "🌪️"}
+                                        <span className="ml-1">{item.focusScore}</span>
+                                    </div>
                                 </div>
-                            </TableCell>
-                            <TableCell>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <MoreHorizontal className="w-4 h-4" />
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+
+                                <div className="w-[100px] shrink-0 text-right">
+                                    <div className="inline-flex items-center gap-1.5 text-sm text-gray-600 font-mono">
+                                        {item.status === "In Progress" ? (
+                                            <div className="flex items-center gap-1.5 text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+                                                <span className="relative flex h-2 w-2">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                                </span>
+                                                {item.duration}
+                                            </div>
+                                        ) : (
+                                            <span>{item.duration}</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
