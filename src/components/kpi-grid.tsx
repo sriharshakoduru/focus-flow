@@ -20,12 +20,12 @@ const METRICS = [
         description: "Focus score avg",
     },
     {
-        title: "Tasks Completed",
-        value: "12",
-        trend: "-2",
-        trendUp: false,
-        icon: CheckCircle2,
-        description: "Daily goal: 15",
+        title: "Sessions",
+        value: "4",
+        trend: "+1",
+        trendUp: true,
+        icon: Target,
+        description: "Daily goal: 6",
     },
     {
         title: "Avg Focus/Session",

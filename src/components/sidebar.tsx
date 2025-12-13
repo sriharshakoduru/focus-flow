@@ -1,17 +1,21 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Home, PieChart, Folder, Settings, Bell } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-    { icon: Home, label: "Home", active: true },
-    { icon: PieChart, label: "Analytics", active: false },
-    { icon: Folder, label: "Projects", active: false },
+    { icon: Home, label: "Home", href: "/" },
+    { icon: PieChart, label: "Trends", href: "/trends" },
+    { icon: Folder, label: "Categories", href: "/categories" },
 ];
 
 export function Sidebar({ className }: { className?: string }) {
+    const pathname = usePathname();
+
     return (
         <div
             className={cn(
@@ -27,19 +31,23 @@ export function Sidebar({ className }: { className?: string }) {
             </div>
 
             <nav className="flex-1 space-y-1">
-                {NAV_ITEMS.map((item) => (
-                    <Button
-                        key={item.label}
-                        variant="ghost"
-                        className={cn(
-                            "w-full justify-start gap-3 h-9 px-2 font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100",
-                            item.active && "bg-white text-gray-900 shadow-sm border border-gray-200"
-                        )}
-                    >
-                        <item.icon className="w-4 h-4" />
-                        {item.label}
-                    </Button>
-                ))}
+                {NAV_ITEMS.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                        <Link key={item.label} href={item.href}>
+                            <Button
+                                variant="ghost"
+                                className={cn(
+                                    "w-full justify-start gap-3 h-9 px-2 font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 mb-1",
+                                    isActive && "bg-white text-gray-900 shadow-sm border border-gray-200"
+                                )}
+                            >
+                                <item.icon className="w-4 h-4" />
+                                {item.label}
+                            </Button>
+                        </Link>
+                    );
+                })}
             </nav>
 
             <div className="border-t border-gray-200 pt-4 space-y-4">
