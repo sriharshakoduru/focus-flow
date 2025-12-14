@@ -37,10 +37,11 @@ const METRICS = [
     },
 ];
 
-export function KPIGrid() {
+export function KPIGrid({ stats }: { stats?: any[] }) {
+    const data = stats || METRICS;
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {METRICS.map((metric) => (
+        <div className="grid grid-cols-2 gap-3">
+            {data.map((metric) => (
                 <Card key={metric.title} className="shadow-sm hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500">
